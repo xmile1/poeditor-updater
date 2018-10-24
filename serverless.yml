@@ -1,0 +1,36 @@
+service:
+  name: poeditor-git-updater
+
+plugins:
+  - serverless-webpack
+  - serverless-pseudo-parameters
+  - serverless-offline
+provider:
+  name: aws
+  region: eu-central-1
+  stage: ${opt:stage, 'dev'}
+  runtime: nodejs8.10
+  logRetentionInDays: 30
+  deploymentBucket:
+    name: serverless-eu-frankfurt
+  versionFunctions: false
+
+functions:
+  updatePOEditors:
+    handler: controllers/updatePoEditor.update
+    events:
+    - http:
+        method: POST
+        path: /updatepoeditor
+    environment:
+      GITLAB_BASE_URL: ${env:GITLAB_BASE_URL}
+      GITLAB_PRIVATE_TOKEN: ${env:GITLAB_PRIVATE_TOKEN}
+      POEDITOR_API_URL: ${env:POEDITOR_API_URL}
+      POEDITOR_API_TOKEN: ${env:POEDITOR_API_TOKEN}
+      PO_PROJECT_ID: ${env:PO_PROJECT_ID}
+      SLACK_FAILED_WEBHOOK_URL: ${env:SLACK_FAILED_WEBHOOK_URL}
+      SLACK_SUCCESS_WEBHOOK_URL: ${env:SLACK_SUCCESS_WEBHOOK_URL}
+      TARGET_BRANCH: ${env:TARGET_BRANCH}
+      MERGE_EVENT: ${env:MERGE_EVENT}
+      SENTRY_DSN: ${env:SENTRY_DSN}
+    timeout: 300
